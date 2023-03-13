@@ -1,0 +1,39 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: hmdp
+  datasource:
+    dynamic:
+      primary: master #设置默认的数据源或者数据源组 默认master
+      strict: false #严格匹配数据源 false 则未找到使用默认 true未找到 则抛异常
+      datasource:
+        master:
+          url: jdbc:mysql://192.168.236.134:3307/hmdp?useSSL=false&serverTimezone=UTC
+          username: root
+          password: root
+          driver-class-name: com.mysql.cj.jdbc.Driver
+        slave:
+          url: jdbc:mysql://192.168.236.134:3308/hmdp?useSSL=false&serverTimezone=UTC
+          username: root
+          password: root
+          driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 192.168.236.134
+    port: 6379
+    password: root
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 10
+        min-idle: 1
+        time-between-eviction-runs: 10s
+  jackson:
+    default-property-inclusion: non_null # JSON处理时忽略非空字段
+mybatis-plus:
+  type-aliases-package: com.hmdp.entity # 别名扫描包
+  configuration:
+    map-underscore-to-camel-case: true # 自动驼峰映射
+logging:
+  level:
+    com.hmdp: debug
