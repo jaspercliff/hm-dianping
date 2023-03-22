@@ -20,6 +20,7 @@ public class SimpleRedisLock implements ILock {
 
     private static final String KEY_PREFIX = "lock:";
     private static final String ID_PREFIX = UUID.randomUUID().toString(true) + "-";
+
     private static final DefaultRedisScript<Long> UNLOCK_SCRIPT;
     static {
         UNLOCK_SCRIPT = new DefaultRedisScript<>();
@@ -34,6 +35,8 @@ public class SimpleRedisLock implements ILock {
         // 获取锁
         Boolean success = stringRedisTemplate.opsForValue()
                 .setIfAbsent(KEY_PREFIX + name, threadId, timeoutSec, TimeUnit.SECONDS);
+//        自动拆箱 如果值为null会出现npe
+//        包装对象的比较最好用equals
         return Boolean.TRUE.equals(success);
     }
 
@@ -45,16 +48,16 @@ public class SimpleRedisLock implements ILock {
                 Collections.singletonList(KEY_PREFIX + name),
                 ID_PREFIX + Thread.currentThread().getId());
     }
-    /*@Override
-    public void unlock() {
-        // 获取线程标示
-        String threadId = ID_PREFIX + Thread.currentThread().getId();
-        // 获取锁中的标示
-        String id = stringRedisTemplate.opsForValue().get(KEY_PREFIX + name);
-        // 判断标示是否一致
-        if(threadId.equals(id)) {
-            // 释放锁
-            stringRedisTemplate.delete(KEY_PREFIX + name);
-        }
-    }*/
+//    @Override
+//    public void unlock() {
+//        // 获取线程标示
+//        String threadId = ID_PREFIX + Thread.currentThread().getId();
+//        // 获取锁中的标示
+//        String id = stringRedisTemplate.opsForValue().get(KEY_PREFIX + name);
+//        // 判断标示是否一致
+//        if(threadId.equals(id)) {
+//            // 释放锁
+//            stringRedisTemplate.delete(KEY_PREFIX + name);
+//        }
+//    }
 }

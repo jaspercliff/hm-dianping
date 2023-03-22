@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8083
 spring:
   application:
     name: hmdp
@@ -9,12 +9,12 @@ spring:
       strict: false #严格匹配数据源 false 则未找到使用默认 true未找到 则抛异常
       datasource:
         master:
-          url: jdbc:mysql://192.168.236.134:3307/hmdp?useSSL=false&serverTimezone=UTC
+          url: jdbc:mysql://192.168.236.134:3307/hmdp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
           username: root
           password: root
           driver-class-name: com.mysql.cj.jdbc.Driver
         slave:
-          url: jdbc:mysql://192.168.236.134:3308/hmdp?useSSL=false&serverTimezone=UTC
+          url: jdbc:mysql://192.168.236.134:3308/hmdp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
           username: root
           password: root
           driver-class-name: com.mysql.cj.jdbc.Driver

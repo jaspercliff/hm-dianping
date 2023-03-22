@@ -8,11 +8,13 @@
         <version>2.3.12.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>com.hmdp</groupId>
     <artifactId>hm-dianping</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>hm-dianping</name>
     <description>Demo project for Spring Boot</description>
+
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -42,9 +44,16 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.20.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+<!--            compile 全部有效 test只在test目录有效 provided在部署到服务器时无效-->
+<!--       compile可以传递 test和provided不能传递-->
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -76,6 +85,13 @@
     <build>
         <plugins>
             <plugin>
+<!--                可以以 SpringBoot 微服务形式直接运行的 jar 包包括：
+当前微服务本身代码
+当前微服务所依赖的 jar 包
+内置 Tomcat（Servlet 容器）
+与 jar 包可以通过 java -jar 方式直接启动相关的配置
+要加入额外的资源、相关配置等等，仅靠 Maven 自身的构建能力是不够的，
+所以要通过 build 标签引入下面的插件-->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
