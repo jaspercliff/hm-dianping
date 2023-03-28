@@ -14,4 +14,18 @@ public class RedissonConfig {
         config.useSingleServer().setAddress("redis://192.168.236.134:6379").setPassword("root");
         return Redisson.create(config);
     }
+
+//    @Bean
+//    public RedissonClient redissonClient1(){
+//        Config config = new Config();
+//        config.useSingleServer().setAddress("redis://192.168.236.134:6380");
+//        return Redisson.create(config);
+//    }
+//
+//    @Bean
+//    public RedissonClient redissonClient2(){
+//        Config config = new Config();
+//        config.useSingleServer().setAddress("redis://192.168.236.134:6381");
+//        return Redisson.create(config);
+//    }
 }

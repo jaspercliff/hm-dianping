@@ -20,18 +20,26 @@ import java.util.concurrent.TimeUnit;
 public class RedissonTest {
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private RedissonClient redissonClient1;
+    @Resource
+    private RedissonClient redissonClient2;
 
     private RLock lock;
 
     @BeforeEach
     void setUp(){
-        lock = redissonClient.getLock("order");
+        RLock lock1 = redissonClient.getLock("order");
+        RLock  lock2 = redissonClient1.getLock("order");
+        RLock lock3= redissonClient2.getLock("order");
+//        创建multiLock
+        lock = redissonClient.getMultiLock(lock3,lock1,lock2);
     }
 
     @Test
     void method1() throws InterruptedException {
 //        尝试获取锁
-        boolean isLock = lock.tryLock();
+        boolean isLock = lock.tryLock(80L,TimeUnit.SECONDS);
         if (!isLock) {
             log.error("获取锁失败...1");
             return;
