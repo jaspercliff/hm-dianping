@@ -2,8 +2,10 @@ package com.hmdp.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.aliyun.oss.internal.OSSUtils;
 import com.hmdp.config.SystemConstants;
 import com.hmdp.dto.Result;
+import com.hmdp.utils.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,19 +21,8 @@ public class UploadController {
 
     @PostMapping("blog")
     public Result uploadImage(@RequestParam("file") MultipartFile image) {
-        try {
-            // 获取原始文件名称
-            String originalFilename = image.getOriginalFilename();
-            // 生成新文件名
-            String fileName = createNewFileName(originalFilename);
-            // 保存文件
-            image.transferTo(new File(SystemConstants.IMAGE_UPLOAD_DIR, fileName));
-            // 返回结果
-            log.debug("文件上传成功，{}", fileName);
-            return Result.ok(fileName);
-        } catch (IOException e) {
-            throw new RuntimeException("文件上传失败", e);
-        }
+        String filePath = UploadUtil.upload(image);
+        return Result.ok(filePath);
     }
 
     @GetMapping("/blog/delete")
