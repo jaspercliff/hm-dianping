@@ -2,6 +2,9 @@ package com.hmdp.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hmdp.entity.Follow;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.hmdp.entity.Follow;
  */
 public interface FollowMapper extends BaseMapper<Follow> {
 
+    List<Follow> queryCommonFollow(@Param("userId") Long userId,@Param("bloggerId") Long bloggerId);
 }

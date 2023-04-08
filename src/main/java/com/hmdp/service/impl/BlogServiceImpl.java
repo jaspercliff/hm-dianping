@@ -1,18 +1,23 @@
 package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.config.SystemConstants;
 import com.hmdp.dto.Result;
+import com.hmdp.dto.ScrollResult;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.Blog;
+import com.hmdp.entity.Follow;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.BlogMapper;
 import com.hmdp.service.IBlogService;
+import com.hmdp.service.IFollowService;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hmdp.config.RedisConstants.BLOG_LIKED_KEY;
+import static com.hmdp.config.RedisConstants.Feed_KEY;
 
 /**
  * <p>
@@ -34,9 +40,83 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
 
     @Resource
     private IUserService userService;
-
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private IFollowService followService;
+    @Override
+    public Result saveBlog(Blog blog) {
+        UserDTO user = UserHolder.getUser();
+        blog.setUserId(user.getId());
+        boolean isSuccess = save(blog);
+        if (!isSuccess) {
+            return Result.fail("failed to add fucking blog");
+        }
+//查询author的所有fans
+        List<Follow> follows = followService.lambdaQuery().eq(Follow::getFollowUserId, user.getId()).list();
+        for (Follow follow : follows) {
+            Long userId = follow.getUserId();
+//        推送blog id 给all fans   收件箱 zset
+            String key = Feed_KEY +userId;
+            stringRedisTemplate.opsForZSet().add(key,blog.getId().toString(),System.currentTimeMillis());
+        }
+//        返回id
+        return Result.ok(blog.getId());
+    }
+
+    /**
+     * 滚动分页
+     * @param max
+     * @param offset
+     * @return
+     */
+    @Override
+    public Result queryBlogOfFollow(Long max, Integer offset) {
+//        获取当前用户
+        Long userId = UserHolder.getUser().getId();
+        String key = Feed_KEY + userId;
+//        查询收件箱 zrevrangebyscore key max min withscores byscore  limit offset count
+//       max（first 当前时间戳 肯定是最大的分数） 上次查询的分数（时间戳）最小值
+//       offset（第一次0）:查询出来的分数与最小值一样的个数
+        Set<ZSetOperations.TypedTuple<String>> typedTuples
+                = stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores(
+                key, 0, max, offset, 2
+        );
+        if (typedTuples == null || typedTuples.isEmpty()) {
+            return Result.ok();
+        }
+//        解析 blogId  score （时间戳） mintime上一次查询的最小时间戳
+        List<Long> ids = new ArrayList<>(typedTuples.size());
+        long minTime = 0;
+        int os = 1; //offset
+        for (ZSetOperations.TypedTuple<String> typedTuple : typedTuples) {
+//            id
+            ids.add(Long.valueOf( typedTuple.getValue()));
+//            score  时间戳
+            long time = typedTuple.getScore().longValue();
+            if(time == minTime){
+                os++;
+            }else {
+                minTime = time;
+                os = 1;
+            }
+        }
+//        查询blog
+        String idStr = StrUtil.join(",", ids);
+        List<Blog> blogs = query().in("id", ids).last("order by field(id," + idStr + ")").list();
+        for (Blog blog : blogs) {
+            queryBlogUser(blog);
+            isBlogLiked(blog);
+        }
+        ScrollResult scrollResult = new ScrollResult();
+        scrollResult.setList(blogs);
+        scrollResult.setOffset(os);
+        scrollResult.setMintime(minTime);
+        return Result.ok(scrollResult);
+    }
+
+
     private void isBlogLiked(Blog blog) {
         UserDTO user = UserHolder.getUser();
         if (user == null) {
@@ -129,6 +209,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         Collections.reverse(userDTOS);
         return Result.ok(userDTOS);
     }
+
+
 
 
     private void queryBlogUser(Blog blog) {

@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.config.RedisConstants.CACHE_SHOP_TYPE;
 import static com.hmdp.config.RedisConstants.CACHE_SHOP_TYPE_TTL;
@@ -53,7 +54,8 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
         }
 //          保存到redis
         stringRedisTemplate.opsForList().rightPushAll(key,list);
-
+        stringRedisTemplate.expire(key,CACHE_SHOP_TYPE_TTL, TimeUnit.MINUTES);
+        log.error("come in");
         return Result.ok(list);
     }
 }

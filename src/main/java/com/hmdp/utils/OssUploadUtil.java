@@ -5,18 +5,15 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
-import com.hmdp.config.SystemConstants;
-import com.hmdp.dto.Result;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
 import static com.hmdp.config.SystemConstants.*;
 
-public class UploadUtil {
+public class OssUploadUtil {
 
     public static String upload(MultipartFile file){
         String result = "";
@@ -46,12 +43,6 @@ public class UploadUtil {
         int hash = name.hashCode();
         int d1 = hash & 0xF;
         int d2 = (hash>>4)& 0xF;
-////        判断目录是否存在
-//        File dir = new File(SystemConstants.IMAGE_UPLOAD_DIR,StrUtil.format("/blogs/{}/{}",d1,d2));
-//        if (!dir.exists()) {
-//            dir.mkdirs();
-//        }
-//        file name
-        return StrUtil.format("blogs/{}/{}/{}.{}",d1,d2,name,suffix);
+        return StrUtil.format("hmdp/blogs/{}/{}/{}.{}",d1,d2,name,suffix);
     }
 }

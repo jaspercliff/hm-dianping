@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.FollowMapper">
+
+    <select id="queryCommonFollow" resultType="com.hmdp.entity.Follow" parameterType="Long">
+        SELECT follow_user_id,count(*) as count
+        from tb_follow
+        WHERE user_id IN(#{userId},#{bloggerId})
+        GROUP BY follow_user_id
+        HAVING count > 1
+    </select>
+</mapper>
