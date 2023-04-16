@@ -23,14 +23,9 @@ spring:
           password: root
           driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    cluster:
-      nodes:
-        - 192.168.236.134:6381
-        - 192.168.236.134:6382
-        - 192.168.236.134:6383
-        - 192.168.236.134:6384
-        - 192.168.236.134:6385
-        - 192.168.236.134:6386
+    host: 192.168.236.134
+    port: 6379
+    password: root
     lettuce:
       pool:
         max-active: 10
