@@ -44,7 +44,6 @@ class HmDianPingApplicationTests {
         cacheClient.setWithLogicalExpire(CACHE_SHOP_KEY+1L,shop,10L, TimeUnit.SECONDS);
     }
 
-    // TODO: 2023/2/5   线程池不懂 juc编程
     @Test
     void testId() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(300);
