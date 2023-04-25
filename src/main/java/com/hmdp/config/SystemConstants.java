@@ -12,8 +12,5 @@ public class SystemConstants {
     /**
      * aliyun oss
      */
-    public static final String ENDPOINT = "oss-cn-shanghai.aliyuncs.com";
-    public static final String ACCESSKEYID = "LTAI5t8hKfnd4gvBWMsVRxzY";
-    public static final String ACCESSKEYSECRET ="jXSa9DyOaV5TL6JDkVykMp41tnepAr";
-    public static final String BUCKETNAME = "jasperbucket";
+
 }
